@@ -1,0 +1,491 @@
+#Pacotes e Bibliotecas Utilizadas
+
+install.packages("vctrs")
+install.packages("plyr")
+install.packages("tidyverse")
+install.packages("scales")
+install.packages("readr")
+install.packages("base")
+installed.packages("PerformanceAnalytics")
+
+library(plyr)
+library(tidyverse)
+library(readr)
+library(readxl)
+library(dplyr)
+library(base)
+library(PerformanceAnalytics)
+library(lubridate)
+
+#Importação das Bases de Dados
+
+COP_Chiller2 <- read_csv("COP Chiller2.csv")
+COP_Chiller3 <- read_csv("COP Chiller3.csv")
+COP_Chiller4 <- read_csv("COP Chiller4.csv")
+Pressao_Ar <- read_csv("Pressão Ar Comprimido.csv")
+Pressao_Suc_C2 <- read_csv("Pressão de Sucção Chiller2.csv")
+Pressao_Suc_C3 <- read_csv("Pressão de Sucção Chiller3.csv")
+Pressao_Suc_C4 <- read_csv("Pressão de Sucção Chiller4.csv")
+Pressao_Desc_Frio_Neg <- read_csv("Pressão Descarga Frio -3.csv")
+Pressao_Desc_Frio_Zero <- read_csv("Pressão Descarga Frio 0.csv")
+Pressao_Suc_Frio_Neg <- read_csv("Pressão Sucção Frio -3.csv")
+Temp_Etanol_178 <- read_csv("Temperatura Etanol 178.csv")
+Temp_Etanol_252 <- read_csv("Temperatura Etanol 252.csv")
+Temp_Etanol_Frio_Zero <- read_csv("Temperatura Etanol Frio 0.csv")
+Temp_Resf_S1_S2 <- read_csv("Temperatura Resfriamento Sala 1 e 2.csv")
+Temp_Resf_S3 <- read_csv("Temperatura Resfriamento Sala 3.csv")
+Temp_Agua_S1_S2 <- read_csv("Temperatura Tanque Água Gelada 1 e 2.csv", locale=locale(encoding="latin1"))
+Indice_Consumo_EE <- read_excel("Consumo EE.xlsx")
+
+#Tratando Base de Dados \\COP_Chiller2\\
+
+COP_Chiller2 <- COP_Chiller2 %>%
+  rename(Data = Time,
+         COP_C2 = COP) %>%
+  mutate(COP_C2 = ifelse(COP_C2 <= 0 | COP_C2 > 10, NA, COP_C2)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+COP_Chiller2 <- group_by(COP_Chiller2,Data)
+COP_Chiller2 <- COP_Chiller2 %>% summarise(COP_C2=mean(COP_C2, na.rm = T))
+COP_Chiller2 <- COP_Chiller2 %>%
+  mutate(COP_C2 = ifelse(is.nan(COP_C2), NA, COP_C2))
+
+#Tratando Base de Dados \\COP_Chiller3\\
+
+COP_Chiller3 <- COP_Chiller3 %>%
+  rename(Data = Time,
+         COP_C3 = COP) %>%
+  mutate(COP_C3 = ifelse(COP_C3 <= 0 | COP_C3 > 10, NA, COP_C3)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+COP_Chiller3 <- group_by(COP_Chiller3,Data)
+COP_Chiller3 <- COP_Chiller3 %>% summarise(COP_C3=mean(COP_C3, na.rm = T))
+COP_Chiller3 <- COP_Chiller3 %>%
+  mutate(COP_C3 = ifelse(is.nan(COP_C3), NA, COP_C3))
+
+#Tratando Base de Dados \\COP_Chiller4\\
+
+COP_Chiller4 <- COP_Chiller4 %>%
+  rename(Data = Time,
+         COP_C4 = COP) %>%
+  mutate(COP_C4 = ifelse(COP_C4 <= 0 | COP_C4 > 10, NA, COP_C4)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+COP_Chiller4 <- group_by(COP_Chiller4,Data)
+COP_Chiller4 <- COP_Chiller4 %>% summarise(COP_C4=mean(COP_C4, na.rm = T))
+COP_Chiller4 <- COP_Chiller4 %>%
+  mutate(COP_C4 = ifelse(is.nan(COP_C4), NA, COP_C4))
+
+#Tratando Base de Dados \\Pressao_Ar\\
+
+Pressao_Ar <- Pressao_Ar %>%
+  rename(Data = Time,
+         P_Ar = CAP.mean) %>%
+  mutate(P_Ar = ifelse(P_Ar <= 0 | P_Ar > 8, NA, P_Ar)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Ar <- group_by(Pressao_Ar,Data)
+Pressao_Ar <- Pressao_Ar %>% summarise(P_Ar=mean(P_Ar, na.rm = T))
+Pressao_Ar <- Pressao_Ar %>%
+  mutate(P_Ar = ifelse(is.nan(P_Ar), NA, P_Ar))
+
+#Tratando Base de Dados \\Pressao_Suc_C2\\
+
+Pressao_Suc_C2 <- Pressao_Suc_C2 %>%
+  rename(Data = Time,
+         P_Suc_C2 = "Chiller 2") %>%
+  mutate(P_Suc_C2 = ifelse(P_Suc_C2 <= 0 | P_Suc_C2 > 6, NA, P_Suc_C2)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Suc_C2 <- group_by(Pressao_Suc_C2,Data)
+Pressao_Suc_C2 <- Pressao_Suc_C2 %>% summarise(P_Suc_C2=mean(P_Suc_C2, na.rm = T))
+Pressao_Suc_C2 <- Pressao_Suc_C2 %>%
+  mutate(P_Suc_C2 = ifelse(is.nan(P_Suc_C2), NA, P_Suc_C2))
+
+#Tratando Base de Dados \\Pressao_Suc_C3\\
+
+Pressao_Suc_C3 <- Pressao_Suc_C3 %>%
+  rename(Data = Time,
+         P_Suc_C3 = "chiller 3") %>%
+  mutate(P_Suc_C3 = ifelse(P_Suc_C3 <= 0 | P_Suc_C3 > 6, NA, P_Suc_C3)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Suc_C3 <- group_by(Pressao_Suc_C3,Data)
+Pressao_Suc_C3 <- Pressao_Suc_C3 %>% summarise(P_Suc_C3=mean(P_Suc_C3, na.rm = T))
+Pressao_Suc_C3 <- Pressao_Suc_C3 %>%
+  mutate(P_Suc_C3 = ifelse(is.nan(P_Suc_C3), NA, P_Suc_C3))
+
+#Tratando Base de Dados \\Pressao_Suc_C4\\
+
+Pressao_Suc_C4 <- Pressao_Suc_C4 %>%
+  rename(Data = Time,
+         P_Suc_C4 = "Chiller 4") %>%
+  mutate(P_Suc_C4 = ifelse(P_Suc_C4 <= 0 | P_Suc_C4 > 6, NA, P_Suc_C4)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Suc_C4 <- group_by(Pressao_Suc_C4,Data)
+Pressao_Suc_C4 <- Pressao_Suc_C4 %>% summarise(P_Suc_C4=mean(P_Suc_C4, na.rm = T))
+Pressao_Suc_C4 <- Pressao_Suc_C4 %>%
+  mutate(P_Suc_C4 = ifelse(is.nan(P_Suc_C4), NA, P_Suc_C4))
+
+#Tratando Base de Dados \\Pressao_Desc_Frio_Neg\\
+
+Pressao_Desc_Frio_Neg <- Pressao_Desc_Frio_Neg %>%
+  rename(Data = Time,
+         P_Desc_Frio_Neg = "Etanol_Negativo.mean") %>%
+  mutate(P_Desc_Frio_Neg = ifelse(P_Desc_Frio_Neg <= 6 | P_Desc_Frio_Neg > 16, NA, P_Desc_Frio_Neg)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Desc_Frio_Neg <- group_by(Pressao_Desc_Frio_Neg,Data)
+Pressao_Desc_Frio_Neg <- Pressao_Desc_Frio_Neg %>% summarise(P_Desc_Frio_Neg=mean(P_Desc_Frio_Neg, na.rm = T))
+Pressao_Desc_Frio_Neg <- Pressao_Desc_Frio_Neg %>%
+  mutate(P_Desc_Frio_Neg = ifelse(is.nan(P_Desc_Frio_Neg), NA, P_Desc_Frio_Neg))
+
+#Tratando Base de Dados \\Pressao_Desc_Frio_Zero\\
+
+Pressao_Desc_Frio_Zero <- Pressao_Desc_Frio_Zero %>%
+  rename(Data = Time,
+         P_Desc_Frio_Zero = "CAP.mean") %>%
+  mutate(P_Desc_Frio_Zero = ifelse(P_Desc_Frio_Zero <= 6 | P_Desc_Frio_Zero > 16, NA, P_Desc_Frio_Zero)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Desc_Frio_Zero <- group_by(Pressao_Desc_Frio_Zero,Data)
+Pressao_Desc_Frio_Zero <- Pressao_Desc_Frio_Zero %>% summarise(P_Desc_Frio_Zero=mean(P_Desc_Frio_Zero, na.rm = T))
+Pressao_Desc_Frio_Zero <- Pressao_Desc_Frio_Zero %>%
+  mutate(P_Desc_Frio_Zero = ifelse(is.nan(P_Desc_Frio_Zero), NA, P_Desc_Frio_Zero))
+
+#Tratando Base de Dados \\Pressao_Suc_Frio_Neg\\
+
+Pressao_Suc_Frio_Neg <- Pressao_Suc_Frio_Neg %>%
+  rename(Data = Time,
+         P_Suc_Frio_Neg = "Etanol_Negativo.mean") %>%
+  mutate(P_Suc_Frio_Neg = ifelse(P_Suc_Frio_Neg <= 0 | P_Suc_Frio_Neg > 7, NA, P_Suc_Frio_Neg)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Pressao_Suc_Frio_Neg <- group_by(Pressao_Suc_Frio_Neg,Data)
+Pressao_Suc_Frio_Neg <- Pressao_Suc_Frio_Neg %>% summarise(P_Suc_Frio_Neg=mean(P_Suc_Frio_Neg, na.rm = T))
+Pressao_Suc_Frio_Neg <- Pressao_Suc_Frio_Neg %>%
+  mutate(P_Suc_Frio_Neg = ifelse(is.nan(P_Suc_Frio_Neg), NA, P_Suc_Frio_Neg))
+
+#Tratando Base de Dados \\Temp_Etanol_178\\
+
+Temp_Etanol_178 <- Temp_Etanol_178 %>%
+  rename(Data = Time,
+         T_Etanol_178 = "Etanol_Negativo.mean") %>%
+  mutate(T_Etanol_178 = ifelse(T_Etanol_178 <= -6 | T_Etanol_178 > 5, NA, T_Etanol_178)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Temp_Etanol_178 <- group_by(Temp_Etanol_178,Data)
+Temp_Etanol_178 <- Temp_Etanol_178 %>% summarise(T_Etanol_178=mean(T_Etanol_178, na.rm = T))
+Temp_Etanol_178 <- Temp_Etanol_178 %>%
+  mutate(T_Etanol_178 = ifelse(is.nan(T_Etanol_178), NA, T_Etanol_178))
+
+#Tratando Base de Dados \\Temp_Etanol_252\\
+
+Temp_Etanol_252 <- Temp_Etanol_252 %>%
+  rename(Data = Time,
+         T_Etanol_252 = "Etanol_Negativo.mean") %>%
+  mutate(T_Etanol_252 = ifelse(T_Etanol_252 <= -6 | T_Etanol_252 > 5, NA, T_Etanol_252)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Temp_Etanol_252 <- group_by(Temp_Etanol_252,Data)
+Temp_Etanol_252 <- Temp_Etanol_252 %>% summarise(T_Etanol_252=mean(T_Etanol_252, na.rm = T))
+Temp_Etanol_252 <- Temp_Etanol_252 %>%
+  mutate(T_Etanol_252 = ifelse(is.nan(T_Etanol_252), NA, T_Etanol_252))
+
+#Tratando Base de Dados \\Temp_Etanol_Frio_Zero\\
+
+Temp_Etanol_Frio_Zero <- Temp_Etanol_Frio_Zero %>%
+  rename(Data = Time,
+         T_Etanol_Frio_Zero = "FRIO_ZERO.mean") %>%
+  mutate(T_Etanol_Frio_Zero = ifelse(T_Etanol_Frio_Zero <= -3 | T_Etanol_Frio_Zero > 6, NA, T_Etanol_Frio_Zero)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Temp_Etanol_Frio_Zero <- group_by(Temp_Etanol_Frio_Zero,Data)
+Temp_Etanol_Frio_Zero <- Temp_Etanol_Frio_Zero %>% summarise(T_Etanol_Frio_Zero=mean(T_Etanol_Frio_Zero, na.rm = T))
+Temp_Etanol_Frio_Zero <- Temp_Etanol_Frio_Zero %>%
+  mutate(T_Etanol_Frio_Zero = ifelse(is.nan(T_Etanol_Frio_Zero), NA, T_Etanol_Frio_Zero))
+
+#Tratando Base de Dados \\Temp_Resf_S1_S2\\
+
+Temp_Resf_S1_S2 <- Temp_Resf_S1_S2 %>%
+  rename(Data = Time,
+         T_Resf_S1_S2 = "Resfriamento Sala 1/2") %>%
+  mutate(T_Resf_S1_S2 = ifelse(T_Resf_S1_S2 <= -3 | T_Resf_S1_S2 > 10, NA, T_Resf_S1_S2)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Temp_Resf_S1_S2 <- group_by(Temp_Resf_S1_S2,Data)
+Temp_Resf_S1_S2 <- Temp_Resf_S1_S2 %>% summarise(T_Resf_S1_S2=mean(T_Resf_S1_S2, na.rm = T))
+Temp_Resf_S1_S2 <- Temp_Resf_S1_S2 %>%
+  mutate(T_Resf_S1_S2 = ifelse(is.nan(T_Resf_S1_S2), NA, T_Resf_S1_S2))
+
+#Tratando Base de Dados \\Temp_Resf_S3\\
+
+Temp_Resf_S3 <- Temp_Resf_S3 %>%
+  rename(Data = Time,
+         T_Resf_S3 = "Resfriamento Sala 3") %>%
+  mutate(T_Resf_S3 = ifelse(T_Resf_S3 <= -3 | T_Resf_S3 > 10, NA, T_Resf_S3)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Temp_Resf_S3 <- group_by(Temp_Resf_S3,Data)
+Temp_Resf_S3 <- Temp_Resf_S3 %>% summarise(T_Resf_S3=mean(T_Resf_S3, na.rm = T))
+Temp_Resf_S3 <- Temp_Resf_S3 %>%
+  mutate(T_Resf_S3 = ifelse(is.nan(T_Resf_S3), NA, T_Resf_S3))
+
+#Tratando Base de Dados \\Temp_Agua_S1_S2\\
+
+Temp_Agua_S1_S2 <- Temp_Agua_S1_S2 %>%
+  rename(Data = Time,
+         T_Agua_S1_S2 = "Temperatura Água Após Resfriamento") %>%
+  mutate(T_Agua_S1_S2 = ifelse(T_Agua_S1_S2 <= 0 | T_Agua_S1_S2 > 12, NA, T_Agua_S1_S2)) %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+Temp_Agua_S1_S2 <- group_by(Temp_Agua_S1_S2,Data)
+Temp_Agua_S1_S2 <- Temp_Agua_S1_S2 %>% summarise(T_Agua_S1_S2=mean(T_Agua_S1_S2, na.rm = T))
+Temp_Agua_S1_S2 <- Temp_Agua_S1_S2 %>%
+  mutate(T_Agua_S1_S2 = ifelse(is.nan(T_Agua_S1_S2), NA, T_Agua_S1_S2))
+
+#Tratando Base de Dados \\Indice_Consumo_EE\\
+
+Indice_Consumo_EE <- Indice_Consumo_EE %>%
+  rename(Consumo_EE = "Consumo EE") %>%
+  mutate(Data = as.Date(Data,"%Y-%m-%d"))
+
+#Criando Base de Dados Única
+
+Base_Dados <- join_all(list(COP_Chiller2, COP_Chiller3, COP_Chiller4, Pressao_Ar, Pressao_Desc_Frio_Neg,
+                            Pressao_Desc_Frio_Zero, Pressao_Suc_C2, Pressao_Suc_C3, Pressao_Suc_C4,
+                            Pressao_Suc_Frio_Neg, Temp_Agua_S1_S2, Temp_Etanol_178, Temp_Etanol_252,
+                            Temp_Etanol_Frio_Zero, Temp_Resf_S1_S2, Temp_Resf_S3, Indice_Consumo_EE))
+Base_Dados <- Base_Dados[-117, ]
+
+#Criando Base de Dados Ordenada
+Base_Dados_Ord <- Base_Dados %>% select(Data, Consumo_EE, everything())
+
+#Analisando Correlação entre Variáveis \\Correlação de Pearson\\
+
+Cor_COP_C2 <- cor.test(Base_Dados$COP_C2, Base_Dados$Consumo_EE, method = "pearson")
+Cor_COP_C2 <- Cor_COP_C2[[4]][[1]]
+
+Cor_COP_C3 <- cor.test(Base_Dados$COP_C3, Base_Dados$Consumo_EE, method = "pearson")
+Cor_COP_C3 <- Cor_COP_C3[[4]][[1]]
+
+Cor_COP_C4 <- cor.test(Base_Dados$COP_C4, Base_Dados$Consumo_EE, method = "pearson")
+Cor_COP_C4 <- Cor_COP_C4[[4]][[1]]
+
+Cor_P_Ar <- cor.test(Base_Dados$P_Ar, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Ar <- Cor_P_Ar[[4]][[1]]
+
+Cor_P_Desc_Frio_Neg <- cor.test(Base_Dados$P_Desc_Frio_Neg, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Desc_Frio_Neg <- Cor_P_Desc_Frio_Neg[[4]][[1]]
+
+Cor_P_Desc_Frio_Zero <- cor.test(Base_Dados$P_Desc_Frio_Zero, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Desc_Frio_Zero <- Cor_P_Desc_Frio_Zero[[4]][[1]]
+
+Cor_P_Suc_C2 <- cor.test(Base_Dados$P_Suc_C2, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Suc_C2 <- Cor_P_Suc_C2[[4]][[1]]
+
+Cor_P_Suc_C3 <- cor.test(Base_Dados$P_Suc_C3, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Suc_C3 <- Cor_P_Suc_C3[[4]][[1]]
+
+Cor_P_Suc_C4 <- cor.test(Base_Dados$P_Suc_C4, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Suc_C4 <- Cor_P_Suc_C4[[4]][[1]]
+
+Cor_P_Suc_Frio_Neg <- cor.test(Base_Dados$P_Suc_Frio_Neg, Base_Dados$Consumo_EE, method = "pearson")
+Cor_P_Suc_Frio_Neg <- Cor_P_Suc_Frio_Neg[[4]][[1]]
+
+Cor_T_Agua_S1_S2 <- cor.test(Base_Dados$T_Agua_S1_S2, Base_Dados$Consumo_EE, method = "pearson")
+Cor_T_Agua_S1_S2 <- Cor_T_Agua_S1_S2[[4]][[1]]
+
+Cor_T_Etanol_178 <- cor.test(Base_Dados$T_Etanol_178, Base_Dados$Consumo_EE, method = "pearson")
+Cor_T_Etanol_178 <- Cor_T_Etanol_178[[4]][[1]]
+
+Cor_T_Etanol_252 <- cor.test(Base_Dados$T_Etanol_252, Base_Dados$Consumo_EE, method = "pearson")
+Cor_T_Etanol_252 <- Cor_T_Etanol_252[[4]][[1]]
+
+Cor_T_Etanol_Frio_Zero <- cor.test(Base_Dados$T_Etanol_Frio_Zero, Base_Dados$Consumo_EE, method = "pearson")
+Cor_T_Etanol_Frio_Zero <- Cor_T_Etanol_Frio_Zero[[4]][[1]]
+
+Cor_T_Resf_S1_S2 <- cor.test(Base_Dados$T_Resf_S1_S2, Base_Dados$Consumo_EE, method = "pearson")
+Cor_T_Resf_S1_S2 <- Cor_T_Resf_S1_S2[[4]][[1]]
+
+Cor_T_Resf_S3 <- cor.test(Base_Dados$T_Resf_S3, Base_Dados$Consumo_EE, method = "pearson")
+Cor_T_Resf_S3 <- Cor_T_Resf_S3[[4]][[1]]
+
+#Criando Base com Correlações
+
+Base_Cor_Valores <- c(Cor_COP_C2, Cor_COP_C3, Cor_COP_C4, Cor_P_Ar, Cor_P_Desc_Frio_Neg, 
+                      Cor_P_Desc_Frio_Zero, Cor_P_Suc_C2, Cor_P_Suc_C3, Cor_P_Suc_C4, Cor_P_Suc_Frio_Neg, 
+                      Cor_T_Agua_S1_S2, Cor_T_Etanol_178, Cor_T_Etanol_252, Cor_T_Etanol_Frio_Zero, 
+                      Cor_T_Resf_S1_S2, Cor_T_Resf_S3)
+Base_Cor_Nomes <- c('COP_C2', 'COP_C3', 'COP_C4', 'P_Ar', 'P_Desc_Frio_Neg','P_Desc_Frio_Zero', 
+                    'P_Suc_C2', 'P_Suc_C3', 'P_Suc_C4', 'P_Suc_Frio_Neg','T_Agua_S1_S2', 'T_Etanol_178', 
+                    'T_Etanol_252', 'T_Etanol_Frio_Zero','T_Resf_S1_S2', 'T_Resf_S3')
+Base_Cor_Valores <- as.data.frame(Base_Cor_Valores)
+Base_Cor_Nomes <- as.data.frame(Base_Cor_Nomes)
+Base_Cor <- cbind(Base_Cor_Nomes, Base_Cor_Valores)
+Base_Cor <- Base_Cor %>%
+  rename(PIs = Base_Cor_Nomes,
+         Correlacao_EE = Base_Cor_Valores)
+Base_Cor <- Base_Cor[order(Base_Cor$Correlacao_EE),]
+view(Base_Cor)
+
+#Visualizando Correlações
+chart.Correlation((Base_Dados_Ord[2:18]), histogram = TRUE)
+Base_Dados_Cor <- Base_Dados_Ord %>% select(Consumo_EE, P_Suc_C3, P_Desc_Frio_Zero,
+                                            T_Agua_S1_S2, COP_C3, COP_C4, P_Suc_C4)
+chart.Correlation(Base_Dados_Cor, histogram = TRUE)
+
+
+#####################################################################################
+#### ANÁLISE POR TURNO DAS VARIÁVEIS DE MAIOR CORRELAÇÃO COM O INDICE DE EE #########
+
+#Importação das Bases de Dados
+
+Turno_COP_Chiller3 <- read_csv("COP Chiller3.csv")
+Turno_COP_Chiller4 <- read_csv("COP Chiller4.csv")
+Turno_Pressao_Suc_C3 <- read_csv("Pressão de Sucção Chiller3.csv")
+Turno_Pressao_Suc_C4 <- read_csv("Pressão de Sucção Chiller4.csv")
+Turno_Pressao_Desc_Frio_Zero <- read_csv("Pressão Descarga Frio 0.csv")
+Turno_Temp_Agua_S1_S2 <- read_csv("Temperatura Tanque Água Gelada 1 e 2.csv", locale=locale(encoding="latin1"))
+Turno_Indice_Consumo_EE <- read_excel("Consumo EE.xlsx")
+
+#Tratando Base de Dados \\Turno_COP_Chiller3\\
+
+Turno_COP_Chiller3 <- Turno_COP_Chiller3 %>%
+  rename(Hora = Time,
+         COP_C3 = COP) %>%
+  mutate(COP_C3 = ifelse(COP_C3 <= 0 | COP_C3 > 10, NA, COP_C3))
+Turno_COP_Chiller3$Hora <- as_datetime(Turno_COP_Chiller3$Hora)
+Turno_COP_Chiller3$Hora <- format(Turno_COP_Chiller3$Hora, "%H")
+Turno_COP_Chiller3$Hora <- as.double(Turno_COP_Chiller3$Hora)
+Turno_COP_Chiller3 <- Turno_COP_Chiller3 %>%
+  mutate(Turno = ifelse(Hora >= 23 | Hora <= 06, "A", 
+                        ifelse(Hora >= 07 & Hora <= 15, "B", "C")))
+Turno_COP_Chiller3 <- Turno_COP_Chiller3[ ,-1]
+Turno_COP_Chiller3 <- Turno_COP_Chiller3 %>%
+  select(Turno, COP_C3)
+Turno_COP_Chiller3 <- group_by(Turno_COP_Chiller3,Turno)
+Turno_COP_Chiller3_Descritiva <- summarise(Turno_COP_Chiller3,
+                                  observações=n(),
+                                  média=mean(COP_C3, na.rm=T),
+                                  mediana=median(COP_C3, na.rm=T),
+                                  desv_pad=sd(COP_C3, na.rm=T), 
+                                  mínimo=min(COP_C3, na.rm=T),
+                                  máximo=max(COP_C3, na.rm=T))
+Turno_COP_Chiller3_Descritiva <- Turno_COP_Chiller3_Descritiva[-4, ]
+view(Turno_COP_Chiller3_Descritiva)
+
+#Tratando Base de Dados \\Turno_COP_Chiller4\\
+
+Turno_COP_Chiller4 <- Turno_COP_Chiller4 %>%
+  rename(Hora = Time,
+         COP_C4 = COP) %>%
+  mutate(COP_C4 = ifelse(COP_C4 <= 0 | COP_C4 > 10, NA, COP_C4))
+Turno_COP_Chiller4$Hora <- as_datetime(Turno_COP_Chiller4$Hora)
+Turno_COP_Chiller4$Hora <- format(Turno_COP_Chiller4$Hora, "%H")
+Turno_COP_Chiller4$Hora <- as.double(Turno_COP_Chiller4$Hora)
+Turno_COP_Chiller4 <- Turno_COP_Chiller4 %>%
+  mutate(Turno = ifelse(Hora >= 23 | Hora <= 06, "A", 
+                        ifelse(Hora >= 07 & Hora <= 15, "B", "C")))
+Turno_COP_Chiller4 <- Turno_COP_Chiller4[ ,-1]
+Turno_COP_Chiller4 <- Turno_COP_Chiller4 %>%
+  select(Turno, COP_C4)
+Turno_COP_Chiller4 <- group_by(Turno_COP_Chiller4,Turno)
+Turno_COP_Chiller4_Descritiva <- summarise(Turno_COP_Chiller4,
+                                           observações=n(),
+                                           média=mean(COP_C4, na.rm=T),
+                                           mediana=median(COP_C4, na.rm=T),
+                                           desv_pad=sd(COP_C4, na.rm=T), 
+                                           mínimo=min(COP_C4, na.rm=T),
+                                           máximo=max(COP_C4, na.rm=T))
+Turno_COP_Chiller4_Descritiva <- Turno_COP_Chiller4_Descritiva[-4, ]
+view(Turno_COP_Chiller4_Descritiva)
+
+#Tratando Base de Dados \\Turno_Pressao_Suc_C3\\
+
+Turno_Pressao_Suc_C3 <- Turno_Pressao_Suc_C3 %>%
+  rename(Hora = Time,
+         P_Suc_C3 = "chiller 3") %>%
+  mutate(P_Suc_C3 = ifelse(P_Suc_C3 <= 0 | P_Suc_C3 > 6, NA, P_Suc_C3))
+Turno_Pressao_Suc_C3$Hora <- as_datetime(Turno_Pressao_Suc_C3$Hora)
+Turno_Pressao_Suc_C3$Hora <- format(Turno_Pressao_Suc_C3$Hora, "%H")
+Turno_Pressao_Suc_C3$Hora <- as.double(Turno_Pressao_Suc_C3$Hora)
+Turno_Pressao_Suc_C3 <- Turno_Pressao_Suc_C3 %>%
+  mutate(Turno = ifelse(Hora >= 23 | Hora <= 06, "A", 
+                        ifelse(Hora >= 07 & Hora <= 15, "B", "C")))
+Turno_Pressao_Suc_C3 <- Turno_Pressao_Suc_C3[ ,-1]
+Turno_Pressao_Suc_C3 <- Turno_Pressao_Suc_C3 %>%
+  select(Turno, P_Suc_C3)
+Turno_Pressao_Suc_C3 <- group_by(Turno_Pressao_Suc_C3,Turno)
+Turno_Pressao_Suc_C3_Descritiva <- summarise(Turno_Pressao_Suc_C3,
+                                           observações=n(),
+                                           média=mean(P_Suc_C3, na.rm=T),
+                                           mediana=median(P_Suc_C3, na.rm=T),
+                                           desv_pad=sd(P_Suc_C3, na.rm=T), 
+                                           mínimo=min(P_Suc_C3, na.rm=T),
+                                           máximo=max(P_Suc_C3, na.rm=T))
+Turno_Pressao_Suc_C3_Descritiva <- Turno_Pressao_Suc_C3_Descritiva[-4, ]
+view(Turno_Pressao_Suc_C3_Descritiva)
+
+#Tratando Base de Dados \\Turno_Pressao_Suc_C4\\
+
+Turno_Pressao_Suc_C4 <- Turno_Pressao_Suc_C4 %>%
+  rename(Hora = Time,
+         P_Suc_C4 = "Chiller 4") %>%
+  mutate(P_Suc_C4 = ifelse(P_Suc_C4 <= 0 | P_Suc_C4 > 6, NA, P_Suc_C4))
+Turno_Pressao_Suc_C4$Hora <- as_datetime(Turno_Pressao_Suc_C4$Hora)
+Turno_Pressao_Suc_C4$Hora <- format(Turno_Pressao_Suc_C4$Hora, "%H")
+Turno_Pressao_Suc_C4$Hora <- as.double(Turno_Pressao_Suc_C4$Hora)
+Turno_Pressao_Suc_C4 <- Turno_Pressao_Suc_C4 %>%
+  mutate(Turno = ifelse(Hora >= 23 | Hora <= 06, "A", 
+                        ifelse(Hora >= 07 & Hora <= 15, "B", "C")))
+Turno_Pressao_Suc_C4 <- Turno_Pressao_Suc_C4[ ,-1]
+Turno_Pressao_Suc_C4 <- Turno_Pressao_Suc_C4 %>%
+  select(Turno, P_Suc_C4)
+Turno_Pressao_Suc_C4 <- group_by(Turno_Pressao_Suc_C4,Turno)
+Turno_Pressao_Suc_C4_Descritiva <- summarise(Turno_Pressao_Suc_C4,
+                                             observações=n(),
+                                             média=mean(P_Suc_C4, na.rm=T),
+                                             mediana=median(P_Suc_C4, na.rm=T),
+                                             desv_pad=sd(P_Suc_C4, na.rm=T), 
+                                             mínimo=min(P_Suc_C4, na.rm=T),
+                                             máximo=max(P_Suc_C4, na.rm=T))
+Turno_Pressao_Suc_C4_Descritiva <- Turno_Pressao_Suc_C4_Descritiva[-4, ]
+view(Turno_Pressao_Suc_C4_Descritiva)
+
+#Tratando Base de Dados \\Turno_Pressao_Desc_Frio_Zero\\
+
+Turno_Pressao_Desc_Frio_Zero <- Turno_Pressao_Desc_Frio_Zero %>%
+  rename(Hora = Time,
+         P_Desc_Frio_Zero = "CAP.mean") %>%
+  mutate(P_Desc_Frio_Zero = ifelse(P_Desc_Frio_Zero <= 6 | P_Desc_Frio_Zero > 16, NA, P_Desc_Frio_Zero))
+Turno_Pressao_Desc_Frio_Zero$Hora <- as_datetime(Turno_Pressao_Desc_Frio_Zero$Hora)
+Turno_Pressao_Desc_Frio_Zero$Hora <- format(Turno_Pressao_Desc_Frio_Zero$Hora, "%H")
+Turno_Pressao_Desc_Frio_Zero$Hora <- as.double(Turno_Pressao_Desc_Frio_Zero$Hora)
+Turno_Pressao_Desc_Frio_Zero <- Turno_Pressao_Desc_Frio_Zero %>%
+  mutate(Turno = ifelse(Hora >= 23 | Hora <= 06, "A", 
+                        ifelse(Hora >= 07 & Hora <= 15, "B", "C")))
+Turno_Pressao_Desc_Frio_Zero <- Turno_Pressao_Desc_Frio_Zero[ ,-1]
+Turno_Pressao_Desc_Frio_Zero <- Turno_Pressao_Desc_Frio_Zero %>%
+  select(Turno, P_Desc_Frio_Zero)
+Turno_Pressao_Desc_Frio_Zero <- group_by(Turno_Pressao_Desc_Frio_Zero,Turno)
+Turno_Pressao_Desc_Frio_Zero_Descritiva <- summarise(Turno_Pressao_Desc_Frio_Zero,
+                                             observações=n(),
+                                             média=mean(P_Desc_Frio_Zero, na.rm=T),
+                                             mediana=median(P_Desc_Frio_Zero, na.rm=T),
+                                             desv_pad=sd(P_Desc_Frio_Zero, na.rm=T), 
+                                             mínimo=min(P_Desc_Frio_Zero, na.rm=T),
+                                             máximo=max(P_Desc_Frio_Zero, na.rm=T))
+Turno_Pressao_Desc_Frio_Zero_Descritiva <- Turno_Pressao_Desc_Frio_Zero_Descritiva[-4, ]
+view(Turno_Pressao_Desc_Frio_Zero_Descritiva)
+
+#Tratando Base de Dados \\Turno_Temp_Agua_S1_S2\\
+
+Turno_Temp_Agua_S1_S2 <- Turno_Temp_Agua_S1_S2 %>%
+  rename(Hora = Time,
+         T_Agua_S1_S2 = "Temperatura Água Após Resfriamento") %>%
+  mutate(T_Agua_S1_S2 = ifelse(T_Agua_S1_S2 <= 0 | T_Agua_S1_S2 > 12, NA, T_Agua_S1_S2))
+Turno_Temp_Agua_S1_S2$Hora <- as_datetime(Turno_Temp_Agua_S1_S2$Hora)
+Turno_Temp_Agua_S1_S2$Hora <- format(Turno_Temp_Agua_S1_S2$Hora, "%H")
+Turno_Temp_Agua_S1_S2$Hora <- as.double(Turno_Temp_Agua_S1_S2$Hora)
+Turno_Temp_Agua_S1_S2 <- Turno_Temp_Agua_S1_S2 %>%
+  mutate(Turno = ifelse(Hora >= 23 | Hora <= 06, "A", 
+                        ifelse(Hora >= 07 & Hora <= 15, "B", "C")))
+Turno_Temp_Agua_S1_S2 <- Turno_Temp_Agua_S1_S2[ ,-1]
+Turno_Temp_Agua_S1_S2 <- Turno_Temp_Agua_S1_S2 %>%
+  select(Turno, T_Agua_S1_S2)
+Turno_Temp_Agua_S1_S2 <- group_by(Turno_Temp_Agua_S1_S2,Turno)
+Turno_Temp_Agua_S1_S2_Descritiva <- summarise(Turno_Temp_Agua_S1_S2,
+                                                     observações=n(),
+                                                     média=mean(T_Agua_S1_S2, na.rm=T),
+                                                     mediana=median(T_Agua_S1_S2, na.rm=T),
+                                                     desv_pad=sd(T_Agua_S1_S2, na.rm=T), 
+                                                     mínimo=min(T_Agua_S1_S2, na.rm=T),
+                                                     máximo=max(T_Agua_S1_S2, na.rm=T))
+Turno_Temp_Agua_S1_S2_Descritiva <- Turno_Temp_Agua_S1_S2_Descritiva[-4, ]
+view(Turno_Temp_Agua_S1_S2_Descritiva)
